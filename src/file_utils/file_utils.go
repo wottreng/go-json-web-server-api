@@ -8,8 +8,8 @@ import (
 )
 
 //function to check if file exists
-func FileExists(filename string) bool {
-	info, err := os.Stat(filename)
+func FileExists(file_path string) bool {
+	info, err := os.Stat(file_path)
 	if os.IsNotExist(err) {
 		return false
 	}
@@ -17,8 +17,8 @@ func FileExists(filename string) bool {
 }
 
 //function to check if filder exists
-func FolderExists(filename string) bool {
-	info, err := os.Stat(filename)
+func FolderExists(folder_path string) bool {
+	info, err := os.Stat(folder_path)
 	if os.IsNotExist(err) {
 		return false
 	}

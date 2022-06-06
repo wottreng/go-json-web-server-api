@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	json2 "encoding/json"
 	"file_utils"
 	"fmt"
@@ -11,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 //http server
@@ -26,22 +26,36 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Usage: %s?topic=<topic>\n", r.URL.Path)
 		return
 	}
+	// GET request
 	if r.Method == "GET" {
 		data_string := handle_get_request(&args)
-		data_split := strings.Split(data_string, "\n")
-		if args.Has("alldata") {
-			for _, line := range data_split {
-				fmt.Fprintf(w, "%s ", line)
-			}
-		} else {
-			fmt.Fprintf(w, "%s\n", data_split[len(data_split)-2])
+		if data_string == "No data" {
+			fmt.Fprintf(w, "No data\n")
+			return
 		}
-	} else if r.Method == "POST" {
+		// split data_string into lines
+		data_split := strings.Split(data_string, "\n")
+		data_split = data_split[:len(data_split)-1]
+		// if all data is requested, return all lines
+		if args.Has("alldata") == true {
+			all_data := strings.Join(data_split, ",")
+			json_data := "{\"data\":[" + all_data + "]}"
+			fmt.Fprintf(w, json_data)
+			return
+		}
+		// all data is not requested, return only the last line
+		fmt.Fprintf(w, "%s\n", data_split[len(data_split)-2])
+		return
+	}
+	// POST
+	if r.Method == "POST" {
 		handle_post_request(&args, r)
 		fmt.Fprintf(w, "data rec\n")
-	} else {
-		fmt.Fprintf(w, "Method not allowed\n")
+		return
 	}
+	//
+	fmt.Fprintf(w, "Method not allowed\n")
+	return
 }
 
 // read data from file
@@ -50,9 +64,12 @@ func handle_get_request(args *url.Values) string {
 	cwd, _ := os.Getwd()
 	path := cwd + "/topics"
 	filename := topic + ".txt"
-	data_string := file_utils.Read_string_from_file(path, filename)
-
-	return data_string
+	if file_utils.FileExists(path + "/" + filename) {
+		data_string := file_utils.Read_string_from_file(path, filename)
+		return data_string
+	} else {
+		return "No data"
+	}
 }
 
 // write data to file for topic
@@ -76,15 +93,22 @@ func handle_post_request(args *url.Values, r *http.Request) {
 		fmt.Printf("Body: No Body Supplied\n")
 		return
 	}
-	var prettyJSON bytes.Buffer
-	if err = json2.Compact(&prettyJSON, bodyBytes); err != nil {
-		fmt.Printf("JSON parse error: %v", err)
-		return
-	}
+
+	var inter interface{}                        // interface to hold json data
+	json2.Unmarshal(bodyBytes, &inter)           // convert json to pointer
+	data := inter.(map[string]interface{})       // convert pointer to map
+	data["timestamp"] = return_epoch_timestamp() // add timestamp to data
+	json_data, _ := json2.Marshal(data)          // convert map to json
 
 	topic := args.Get("topic")
 	cwd, _ := os.Getwd()
 	path := cwd + "/topics"
 	filename := topic + ".txt"
-	file_utils.Write_string_to_file(string(prettyJSON.Bytes()), path, filename)
+	file_utils.Write_string_to_file(string(json_data), path, filename)
+}
+
+func return_epoch_timestamp() int64 {
+	now := time.Now()
+	unix_timestamp := now.Unix()
+	return unix_timestamp
 }
