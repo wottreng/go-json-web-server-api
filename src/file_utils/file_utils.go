@@ -112,3 +112,12 @@ func Write_data_to_file(data []byte, path string, file_name string) bool {
 	//fmt.Println("done")
 	return true
 }
+
+// function for writing an error log
+func Log_error_to_file(err error) {
+	error_string := fmt.Sprintf("[-->] Error: %v", err)
+	cwd, _ := os.Getwd()
+	error_log_path := cwd + "/logs"
+	error_log_file := "error_log.txt"
+	Write_string_to_file(error_string, error_log_path, error_log_file)
+}
