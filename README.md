@@ -1,6 +1,9 @@
 # go-json-web-server-api
 simple json data web server written in golang
 
+## TLDR
+a api server for sending and receiving json data
+
 ## Purpose
 * handle json data per 'topic'
   * topic argument is used to select data

@@ -1,5 +1,7 @@
 package main
 
+// TODO: add arg to tell server the number of lines to return
+
 import (
 	"http_utils"
 	"log"
