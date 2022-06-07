@@ -20,6 +20,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//fmt.Printf("Headers: %+v\n", r.Header)
+
 	// method handlers
 	switch r.Method {
 	case "GET":

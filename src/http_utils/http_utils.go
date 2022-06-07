@@ -109,8 +109,6 @@ func handle_post_request_data(r *http.Request) {
 		}(r.Body)
 	}
 
-	//fmt.Printf("Headers: %+v\n", r.Header)
-
 	if len(bodyBytes) == 0 {
 		fmt.Printf("Body: No Body Supplied\n")
 		return
