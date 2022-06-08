@@ -32,6 +32,7 @@ func Method_not_allowed_handler(w http.ResponseWriter) {
 	}
 }
 
+// function to build file name with topic and current date
 func build_file_name(topic string) string {
 	filename := topic + "_" + time_utils.Return_current_date() + ".txt"
 	return filename

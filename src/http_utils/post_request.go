@@ -81,9 +81,9 @@ func process_body_data(bodyBytes []byte) ([]byte, error) {
 		file_utils.Log_error_to_file(err)
 		return nil, err
 	}
-	data := inter.(map[string]interface{})                  // convert pointer to map
-	data["timestamp"] = time_utils.Return_epoch_timestamp() // add timestamp to data
-	data["date_time"] = time_utils.Return_date_time_from_epoch_timestamp(data["timestamp"].(int64))
+	data := inter.(map[string]interface{})                          // convert pointer to map
+	data["timestamp"] = time_utils.Return_current_epoch_timestamp() // add timestamp to data
+	data["time_date"] = time_utils.Return_time_date_from_epoch_timestamp(data["timestamp"].(int64))
 	json_data, _ := json2.Marshal(data) // convert map to json
 	return json_data, err
 }

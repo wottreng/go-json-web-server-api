@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+var VERBOSE bool = false
+
 // function to check cmd line args for development or production mode
 func Handle_cmd_line_args() bool {
 	cmd_line_args := os.Args[1:]

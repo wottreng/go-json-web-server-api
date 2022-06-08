@@ -3,6 +3,7 @@ package main
 // TODO: add request arg handler to tell server the number of lines to return
 
 import (
+	"fmt"
 	"http_utils"
 	"log"
 	"net/http"
@@ -11,9 +12,13 @@ import (
 
 //http server
 func main() {
+	// defaults
 	host_address_and_port := "localhost:8080"
+	system_utils.VERBOSE = true
+	// check if production mode is requested
 	if system_utils.Handle_cmd_line_args() == true { // true --> prod mode
 		host_address_and_port = http_utils.Return_host_ip_address_and_port()
+		system_utils.VERBOSE = false
 	}
 	//
 	println("[INFO] starting server on address: " + host_address_and_port)
@@ -23,8 +28,9 @@ func main() {
 
 //
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	//fmt.Printf("Headers: %+v\n", r.Header)
-
+	if system_utils.VERBOSE == true {
+		fmt.Printf("Headers: %+v\n", r.Header)
+	}
 	//check if topic arg is present
 	if http_utils.Check_if_topic_arg_is_present(w, r) == false {
 		return
