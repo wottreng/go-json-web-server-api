@@ -3,9 +3,9 @@ package http_utils
 import (
 	"file_utils"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
-	"os"
 	"time_utils"
 )
 
@@ -37,27 +37,34 @@ func build_file_name(topic string) string {
 	return filename
 }
 
-// function to return host ip address
-func Return_host_ip_address() string {
-	var host_address string
+// function to return host ip address and port
+func Return_host_ip_address_and_port() string {
+	acceptable_addresses := []string{"192.168.", "10.42."}
+	host_ip_address := ""
+	host_port := "8080"
+	//
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-		println("Oops: " + err.Error() + "\n")
-		os.Exit(1)
+		log.Fatal("[Error] " + err.Error() + "\n")
 	}
-	acceptable_addresses := []string{"192.168.", "10.42."}
+	//
 	for _, a := range addrs {
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
 				//println(ipnet.IP.String() + "\n")
 				for _, acceptable_address := range acceptable_addresses {
 					if ipnet.IP.String()[0:len(acceptable_address)] == acceptable_address {
-						host_address = ipnet.IP.String()
+						host_ip_address = ipnet.IP.String()
 						break
 					}
 				}
 			}
 		}
 	}
-	return host_address
+	if host_ip_address == "" {
+		log.Fatal("[ERROR] Could not find host ip address")
+	}
+	//
+	public_address_and_port := host_ip_address + ":" + host_port
+	return public_address_and_port
 }
