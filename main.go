@@ -7,12 +7,21 @@ import (
 	"http_utils"
 	"log"
 	"net/http"
+	"os"
 )
 
 //http server
 func main() {
+	host_address := http_utils.Return_host_ip_address()
+	if host_address == "" {
+		log.Fatal("Could not find host ip address")
+		os.Exit(1)
+	}
+	//
+	public_address := host_address + ":8080"
+	println("starting server on address: " + public_address)
 	http.HandleFunc("/", rootHandler)
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
+	log.Fatal(http.ListenAndServe(public_address, nil))
 }
 
 //
