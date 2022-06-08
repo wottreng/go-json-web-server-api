@@ -1,15 +1,9 @@
 package http_utils
 
 import (
-	json2 "encoding/json"
 	"file_utils"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
-	"net/url"
-	"os"
-	"strings"
 	"time_utils"
 )
 
@@ -27,121 +21,16 @@ func Check_if_topic_arg_is_present(w http.ResponseWriter, r *http.Request) bool 
 	return true
 }
 
-// main function to handle GET requests
-func Get_request_handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	var err error
-	//
-	args := r.URL.Query()
-	data_string := handle_get_request_data(&args)
-	if data_string == "No data" {
-		_, err = fmt.Fprintf(w, "%s\n", "{\"data\":\"empty\"}")
-		if err != nil {
-			file_utils.Log_error_to_file(err)
-			return
-		}
-		return
-	}
-	// split data_string into lines
-	data_split := strings.Split(data_string, "\n")
-	data_split = data_split[:len(data_split)-1]
-	// if all data is requested, return all lines
-	if args.Get("alldata") == "true" {
-		all_data := strings.Join(data_split, ",")
-		json_data := "{\"data\":[" + all_data + "]}"
-		_, err = fmt.Fprintf(w, "%s\n", json_data)
-		if err != nil {
-			file_utils.Log_error_to_file(err)
-			return
-		}
-		return
-	}
-	// all data is not requested, return only the last line
-	_, err = fmt.Fprintf(w, "%s\n", data_split[len(data_split)-2])
-	if err != nil {
-		file_utils.Log_error_to_file(err)
-		return
-	}
-	return
-}
-
-// read data from file
-func handle_get_request_data(args *url.Values) string {
-	topic := args.Get("topic")
-	cwd, _ := os.Getwd()
-	path := cwd + "/topics"
-	filename := topic + ".txt"
-	if file_utils.FileExists(path + "/" + filename) {
-		data_string := file_utils.Read_string_from_file(path, filename)
-		return data_string
-	}
-	// file does not exist, return no data
-	return "No data"
-}
-
-// main function to handle POST requests
-func Post_request_handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	var err error
-	//
-	server_message := handle_post_request_data(r)
-	_, err = fmt.Fprintf(w, "%s\n", "{\"data\":\""+server_message+"\"}")
-	if err != nil {
-		file_utils.Log_error_to_file(err)
-	}
-}
-
-// write data to file for topic
-func handle_post_request_data(r *http.Request) string {
-	args := r.URL.Query()
-	var bodyBytes []byte
-	var err error
-
-	if r.Body != nil {
-		bodyBytes, err = ioutil.ReadAll(r.Body)
-		if err != nil {
-			file_utils.Log_error_to_file(err)
-			return "Error reading body"
-		}
-
-		defer func(Body io.ReadCloser) { // close body
-			err = Body.Close()
-			if err != nil {
-				file_utils.Log_error_to_file(err)
-				return
-			}
-		}(r.Body)
-	}
-
-	if len(bodyBytes) == 0 {
-		//fmt.Printf("Body: No Body Supplied\n")
-		return "No Body data"
-	}
-
-	var inter interface{}                    // interface to hold json data
-	err = json2.Unmarshal(bodyBytes, &inter) // convert json to pointer
-	if err != nil {
-		file_utils.Log_error_to_file(err)
-		return "Error coverting body data to json"
-	}
-	data := inter.(map[string]interface{})                  // convert pointer to map
-	data["timestamp"] = time_utils.Return_epoch_timestamp() // add timestamp to data
-	data["date_time"] = time_utils.Return_date_time_from_epoch_timestamp(data["timestamp"].(int64))
-	json_data, _ := json2.Marshal(data) // convert map to json
-
-	topic := args.Get("topic")
-	cwd, _ := os.Getwd()
-	path := cwd + "/topics"
-	filename := topic + ".txt"
-	file_utils.Write_string_to_file(string(json_data), path, filename)
-	return "received"
-}
-
 // return response for methods not supported
-func Method_not_allowed_handler(w http.ResponseWriter, r *http.Request) {
+func Method_not_allowed_handler(w http.ResponseWriter) {
 	_, err := fmt.Fprintf(w, "Method not allowed\n")
 	if err != nil {
 		file_utils.Log_error_to_file(err)
 		return
 	}
+}
+
+func build_file_name(topic string) string {
+	filename := topic + "_" + time_utils.Return_current_date() + ".txt"
+	return filename
 }

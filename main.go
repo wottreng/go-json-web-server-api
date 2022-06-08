@@ -1,6 +1,7 @@
 package main
 
 // TODO: add arg to tell server the number of lines to return
+// TODO: write data to file per day
 
 import (
 	"http_utils"
@@ -31,6 +32,6 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		http_utils.Post_request_handler(w, r)
 	default:
-		http_utils.Method_not_allowed_handler(w, r)
+		http_utils.Method_not_allowed_handler(w)
 	}
 }

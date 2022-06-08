@@ -8,7 +8,7 @@ import (
 )
 
 //function to check if file exists
-func FileExists(file_path string) bool {
+func Does_file_exist(file_path string) bool {
 	info, err := os.Stat(file_path)
 	if os.IsNotExist(err) {
 		return false
@@ -17,7 +17,7 @@ func FileExists(file_path string) bool {
 }
 
 //function to check if filder exists
-func FolderExists(folder_path string) bool {
+func Does_folder_exist(folder_path string) bool {
 	info, err := os.Stat(folder_path)
 	if os.IsNotExist(err) {
 		return false
@@ -63,16 +63,16 @@ func Read_string_from_file(path string, file_name string) string {
 
 func Write_string_to_file(data_string string, path string, file_name string) bool {
 	//
-	if !FolderExists(path) {
+	if !Does_folder_exist(path) {
 		CreateFolder(path)
 	}
 	//
 	absolute_path := path + "/" + file_name
 	//
 	var file_data string
-	if FileExists(absolute_path) {
+	if Does_file_exist(absolute_path) {
 		//println("[-->] File already exists")
-		*&file_data = Read_string_from_file(path, file_name)
+		file_data = Read_string_from_file(path, file_name)
 	} else {
 		CreateFile(absolute_path)
 	}
