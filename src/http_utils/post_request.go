@@ -92,6 +92,6 @@ func process_body_data(bodyBytes []byte) ([]byte, error) {
 func write_data_to_topic_directory(json_data []byte, topic string) {
 	cwd, _ := os.Getwd()
 	path := cwd + "/topics/" + topic
-	filename := build_file_name(topic)
+	filename := file_utils.Build_file_name(topic)
 	file_utils.Write_string_to_file(string(json_data), path, filename)
 }

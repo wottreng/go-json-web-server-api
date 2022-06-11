@@ -6,14 +6,23 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"time_utils"
 )
 
 // function to check if topic arg is present
-func Check_if_topic_arg_is_present(w http.ResponseWriter, r *http.Request) bool {
+func Check_if_args_are_present(w http.ResponseWriter, r *http.Request) bool {
 	args := r.URL.Query()
-	if !args.Has("topic") {
+	// if help arg is present, return help message
+	if args.Has("help") {
 		_, err := fmt.Fprintf(w, "Usage: %s?topic=<topic>\n", r.URL.Path)
+		if err != nil {
+			file_utils.Log_error_to_file(err)
+			return false
+		}
+		return false
+	}
+	// if topic arg is not present, return error message
+	if !args.Has("topic") {
+		_, err := fmt.Fprintf(w, "not an endpoint\n")
 		if err != nil {
 			file_utils.Log_error_to_file(err)
 			return false
@@ -30,12 +39,6 @@ func Method_not_allowed_handler(w http.ResponseWriter) {
 		file_utils.Log_error_to_file(err)
 		return
 	}
-}
-
-// function to build file name with topic and current date
-func build_file_name(topic string) string {
-	filename := topic + "_" + time_utils.Return_current_date() + ".txt"
-	return filename
 }
 
 // function to return host ip address and port

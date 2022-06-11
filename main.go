@@ -32,7 +32,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Headers: %+v\n", r.Header)
 	}
 	//check if topic arg is present
-	if http_utils.Check_if_topic_arg_is_present(w, r) == false {
+	if http_utils.Check_if_args_are_present(w, r) == false {
 		return
 	}
 

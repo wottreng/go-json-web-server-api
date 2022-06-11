@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time_utils"
 )
 
 //function to check if file exists
@@ -120,4 +121,10 @@ func Log_error_to_file(err error) {
 	error_log_path := cwd + "/logs"
 	error_log_file := "error_log.txt"
 	Write_string_to_file(error_string, error_log_path, error_log_file)
+}
+
+// function to build file name with topic and current date
+func Build_file_name(topic string) string {
+	filename := topic + "_" + time_utils.Return_current_date() + ".txt"
+	return filename
 }

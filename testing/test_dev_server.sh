@@ -1,4 +1,11 @@
 #!/bin/bash
+echo "[-->] try url with no args"
+curl -i "localhost:8080/"  # not an endpoint
+echo ""
+#
+echo "[-->] try url with help arg"
+curl -i "localhost:8080/?help"  # Usage: /?topic=<topic>
+echo ""
 #
 echo "[-->] try to retrieve data for a topic that does not exist"
 curl -i -H "Accept: application/json" "localhost:8080/?topic=doesntExist"

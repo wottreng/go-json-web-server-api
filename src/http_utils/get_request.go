@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"system_utils"
 )
 
 // main function to handle GET requests
@@ -26,7 +27,7 @@ func Get_request_handler(w http.ResponseWriter, r *http.Request) {
 	}
 	// split data_string into lines
 	data_split := strings.Split(data_string, "\n")
-	data_split = data_split[:len(data_split)-1]
+	data_split = data_split[:len(data_split)-1] // remove last empty line
 	// if all data is requested, return all lines
 	if args.Get("alldata") == "true" {
 		all_data := strings.Join(data_split, ",")
@@ -52,11 +53,12 @@ func handle_get_request_data(args *url.Values) string {
 	topic := args.Get("topic")
 	cwd, _ := os.Getwd()
 	path := cwd + "/topics/" + topic
-	filename := build_file_name(topic)
-	if file_utils.Does_file_exist(path + "/" + filename) {
-		data_string := file_utils.Read_string_from_file(path, filename)
-		return data_string
+	// get latest file in topic directory
+	filename := system_utils.Get_latest_file_in_directory(path, topic)
+	if filename == "" { // file does not exist, return no data
+		return "No data"
 	}
-	// file does not exist, return no data
-	return "No data"
+	//
+	data_string := file_utils.Read_string_from_file(path, filename)
+	return data_string
 }
