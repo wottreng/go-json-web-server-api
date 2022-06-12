@@ -2,7 +2,6 @@ package system_utils
 
 /*
 purpose: functions for dealing with system level operations like file system, cmd line args
-
 written by: Mark Wottreng
 */
 
@@ -48,20 +47,18 @@ func List_files_in_directory(directory string, file_name_substring string) []str
 	//
 	var files []string
 	//
+	if file_utils.Does_folder_exist(directory) == false {
+		return files
+	}
 	file_info, err := ioutil.ReadDir(directory)
 	if err != nil {
-		file_utils.Log_error_to_file(err)
+		file_utils.Log_error_to_file(err, "List_files_in_directory")
 		return files
 	}
 	// sort files in descending order by mod time
 	sort.Slice(file_info, func(i, j int) bool {
 		return file_info[i].ModTime().After(file_info[j].ModTime())
 	})
-	fmt.Println("\n-----------------------------------\n")
-	for _, file := range file_info {
-		fmt.Println(file.Name(), file.Size(), file.ModTime())
-	}
-	fmt.Println("\n-----------------------------------\n")
 	//
 	for _, file := range file_info {
 		if file.IsDir() {

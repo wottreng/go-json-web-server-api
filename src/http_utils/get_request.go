@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"system_utils"
 )
@@ -20,21 +21,44 @@ func Get_request_handler(w http.ResponseWriter, r *http.Request) {
 	if data_string == "No data" {
 		_, err = fmt.Fprintf(w, "%s\n", "{\"data\":\"empty\"}")
 		if err != nil {
-			file_utils.Log_error_to_file(err)
+			file_utils.Log_error_to_file(err, "Get_request_handler")
 			return
 		}
 		return
 	}
 	// split data_string into lines
 	data_split := strings.Split(data_string, "\n")
-	data_split = data_split[:len(data_split)-1] // remove last empty line
 	// if all data is requested, return all lines
 	if args.Get("alldata") == "true" {
+		data_split = data_split[:len(data_split)-1] // remove last empty line
 		all_data := strings.Join(data_split, ",")
 		json_data := "{\"data\":[" + all_data + "]}"
 		_, err = fmt.Fprintf(w, "%s\n", json_data)
 		if err != nil {
-			file_utils.Log_error_to_file(err)
+			file_utils.Log_error_to_file(err, "Get_request_handler")
+			return
+		}
+		return
+	}
+	// if rows arg in request, return number of rows
+	if args.Get("rows") != "" {
+		rows := args.Get("rows")
+		rows_int, err := strconv.Atoi(rows)
+		if err != nil {
+			file_utils.Log_error_to_file(err, "Get_request_handler")
+			return
+		}
+		// if rows is greater than number of lines, return all lines
+		if rows_int > (len(data_split) - 1) {
+			println("[INFO] rows arg is greater than number of lines, returning all lines")
+			rows_int = len(data_split) - 1
+		}
+		data_split = data_split[len(data_split)-1-rows_int : len(data_split)-1]
+		all_data := strings.Join(data_split, ",")
+		json_data := "{\"data\":[" + all_data + "]}"
+		_, err = fmt.Fprintf(w, "%s\n", json_data)
+		if err != nil {
+			file_utils.Log_error_to_file(err, "Get_request_handler")
 			return
 		}
 		return
@@ -42,7 +66,7 @@ func Get_request_handler(w http.ResponseWriter, r *http.Request) {
 	// all data is not requested, return only the last line
 	_, err = fmt.Fprintf(w, "%s\n", data_split[len(data_split)-2])
 	if err != nil {
-		file_utils.Log_error_to_file(err)
+		file_utils.Log_error_to_file(err, "Get_request_handler")
 		return
 	}
 	return

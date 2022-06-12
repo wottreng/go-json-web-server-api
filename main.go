@@ -1,6 +1,9 @@
-package main
+/*
+json web server api
+written by Mark Wottreng
+*/
 
-// TODO: add request arg handler to tell server the number of lines to return
+package main
 
 import (
 	"fmt"
