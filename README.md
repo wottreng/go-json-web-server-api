@@ -1,5 +1,7 @@
 # go-json-web-server-api
-simple json data web server written in golang
+simple json data web server written in golang 
+
+<img src="https://github.com/wottreng/go-json-web-server-api/blob/main/pics/gopher.jpeg" alt="go-gopher"  width="auto" height="auto" />
 
 ## TLDR
 a api server for sending and receiving json data
