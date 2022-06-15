@@ -8,7 +8,7 @@ replace http_utils => ./src/http_utils
 
 replace system_utils => ./src/system_utils
 
-//replace data_utils => ./src/data_utils
+replace data_utils => ./src/data_utils
 
 go 1.18
 
@@ -18,6 +18,7 @@ require (
 )
 
 require (
+	data_utils v0.0.0-00010101000000-000000000000 // indirect
 	file_utils v0.0.0-00010101000000-000000000000 // indirect
 	time_utils v0.0.0-00010101000000-000000000000 // indirect
 )
