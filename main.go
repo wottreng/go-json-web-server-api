@@ -1,6 +1,5 @@
 /*
 json web server api
-TODO: if rows of data requested is greater than current file rows then read older files
 TODO: add optional api key
 written by Mark Wottreng
 */

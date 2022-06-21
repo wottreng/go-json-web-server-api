@@ -1,9 +1,9 @@
 package file_utils
 
 import (
+	"bufio"
 	"fmt"
 	"os"
-	"strings"
 	"time_utils"
 )
 
@@ -48,33 +48,69 @@ func CreateFile(filePath string) {
 
 func Read_string_from_file(path string, file_name string) string {
 	var string_data string
+	var err error
+	var byte_data []byte
+	var message string
+	//
 	absolute_path := path + "/" + file_name
-	byte_data, err := os.ReadFile(absolute_path)
-	if err != nil {
-		Log_error_to_file(err, "Read_string_from_file")
-		topic := strings.Split(file_name, ".")
-		message := "No data for: " + topic[0]
-		return message
+	number_of_attempts := 3
+	for i := 0; i < number_of_attempts; i++ {
+		byte_data, err = os.ReadFile(absolute_path)
+		if err != nil {
+			Log_error_to_file(err, "Read_string_from_file")
+			message = "data read error\n"
+			return message
+		}
+		if len(byte_data) > 0 {
+			break
+		}
 	}
+	if len(byte_data) < 1 {
+		return "data read error\n"
+	}
+	//
 	string_data = string(byte_data)
 	return string_data
 }
 
 func Write_string_to_file(data_string string, path string, file_name string) bool {
+	// TODO: concurrency race condition issue. failing stress test.
+	var err error
+	absolute_path := path + "/" + file_name
+	var file_data string
+	//
 	if !Does_folder_exist(path) {
 		CreateFolder(path)
 	}
 	//
-	absolute_path := path + "/" + file_name
-	var file_data string
 	if Does_file_exist(absolute_path) {
 		file_data = Read_string_from_file(path, file_name)
 	} else {
 		CreateFile(absolute_path)
 	}
 	data := []byte(file_data + data_string + "\n")
-	err := os.WriteFile(absolute_path, data, 0644)
+	file_pointer, err := os.Create(absolute_path)
 	if err != nil {
+		Log_error_to_file(err, "Write_string_to_file")
+		return false
+	}
+	defer func(file_pointer *os.File) {
+		err = file_pointer.Close()
+		if err != nil {
+			Log_error_to_file(err, "Write_string_to_file")
+		}
+	}(file_pointer)
+	//
+	// make a write buffer
+	w := bufio.NewWriter(file_pointer)
+	//
+	_, err = w.Write(data)
+	//err := os.WriteFile(absolute_path, data, 0644)
+	if err != nil {
+		Log_error_to_file(err, "Write_string_to_file")
+	}
+	//
+	if err = w.Flush(); err != nil {
 		Log_error_to_file(err, "Write_string_to_file")
 	}
 	//
