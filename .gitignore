@@ -3,3 +3,5 @@
 /testing/test_public_server.sh
 /server
 /logs
+/src/fslock.zip
+/src/flock.zip

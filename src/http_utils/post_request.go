@@ -41,13 +41,16 @@ func handle_post_request_data(r *http.Request) string {
 	// process body data:
 	json_data, err := process_body_data(bodyBytes)
 	if err != nil {
+		file_utils.Log_error_to_file(err, "Error processing body data")
 		return "Error processing body data"
 	}
 	// write json data to file:
 	topic := args.Get("topic")
-	write_data_to_topic_directory(json_data, topic)
-	//
-	return "received"
+	if write_data_to_topic_directory(json_data, topic) {
+		return "received"
+	} else {
+		return "write error"
+	}
 }
 
 // function to read request body data
@@ -78,7 +81,7 @@ func process_body_data(bodyBytes []byte) ([]byte, error) {
 	var inter interface{}                     // interface to hold json data
 	err := json2.Unmarshal(bodyBytes, &inter) // convert json to pointer
 	if err != nil {
-		file_utils.Log_error_to_file(err)
+		file_utils.Log_error_to_file(err, "Error unmarshalling json")
 		return nil, err
 	}
 	data := inter.(map[string]interface{})                          // convert pointer to map
@@ -89,9 +92,10 @@ func process_body_data(bodyBytes []byte) ([]byte, error) {
 }
 
 // function to write data to file for topic
-func write_data_to_topic_directory(json_data []byte, topic string) {
+func write_data_to_topic_directory(json_data []byte, topic string) bool {
 	cwd, _ := os.Getwd()
 	path := cwd + "/topics/" + topic
 	filename := file_utils.Build_file_name(topic)
-	_ = file_utils.Write_string_to_file(string(json_data), path, filename)
+	status := file_utils.Write_string_to_file(string(json_data), path, filename)
+	return status
 }

@@ -1,8 +1,8 @@
 package file_utils
 
 import (
-	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"time_utils"
 )
@@ -53,7 +53,7 @@ func Read_string_from_file(path string, file_name string) string {
 	var message string
 	//
 	absolute_path := path + "/" + file_name
-	number_of_attempts := 3
+	number_of_attempts := 5
 	for i := 0; i < number_of_attempts; i++ {
 		byte_data, err = os.ReadFile(absolute_path)
 		if err != nil {
@@ -74,50 +74,35 @@ func Read_string_from_file(path string, file_name string) string {
 }
 
 func Write_string_to_file(data_string string, path string, file_name string) bool {
-	// TODO: concurrency race condition issue. failing stress test.
 	var err error
 	absolute_path := path + "/" + file_name
-	var file_data string
 	//
 	if !Does_folder_exist(path) {
 		CreateFolder(path)
 	}
 	//
-	if Does_file_exist(absolute_path) {
-		file_data = Read_string_from_file(path, file_name)
-	} else {
-		CreateFile(absolute_path)
-	}
-	data := []byte(file_data + data_string + "\n")
-	file_pointer, err := os.Create(absolute_path)
+	f, err := os.OpenFile(absolute_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0655)
 	if err != nil {
 		Log_error_to_file(err, "Write_string_to_file")
 		return false
 	}
-	defer func(file_pointer *os.File) {
-		err = file_pointer.Close()
+	defer func(f *os.File) {
+		err = f.Close()
 		if err != nil {
 			Log_error_to_file(err, "Write_string_to_file")
 		}
-	}(file_pointer)
+	}(f)
 	//
-	// make a write buffer
-	w := bufio.NewWriter(file_pointer)
-	//
-	_, err = w.Write(data)
-	//err := os.WriteFile(absolute_path, data, 0644)
+	logger := log.New(f, "", 0) // used to handle concurrent writes
+	err = logger.Output(2, data_string)
 	if err != nil {
 		Log_error_to_file(err, "Write_string_to_file")
-	}
-	//
-	if err = w.Flush(); err != nil {
-		Log_error_to_file(err, "Write_string_to_file")
+		return false
 	}
 	//
 	return true
 }
 
-// function for writing data to file
 func Write_data_to_file(data []byte, path string, file_name string) bool {
 	var err error
 	absolute_path := path + "/" + file_name
@@ -152,7 +137,11 @@ func Log_error_to_file(err error, custom_message ...string) {
 	cwd, _ := os.Getwd()
 	error_log_path := cwd + "/logs"
 	error_log_file := "error_log.txt"
-	Write_string_to_file(error_string, error_log_path, error_log_file)
+	//
+	f, err := os.OpenFile(error_log_path+"/"+error_log_file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0655)
+	logger := log.New(f, "", log.LstdFlags)
+	logger.Output(2, error_string)
+	//Write_string_to_file(error_string, error_log_path, error_log_file)
 }
 
 // function to build file name with topic and current date

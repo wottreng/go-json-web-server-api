@@ -5,10 +5,12 @@
 
 clear
 
-for i in {1..10}
+for i in {1..5}
 do
-  echo $i
-  curl -X POST -H 'Content-Type: application/json' -d '{"temp":"68","humidity%":"45"}' "localhost:8080?topic=rand" &
-  curl "localhost:8080/?topic=rand" & # | jq
+#  echo $i
+  curl "localhost:8080/?topic=rand" &
+  str="{\"temp\":\"68\",\"count\":\"$i\"}"
+  curl -X POST -H 'Content-Type: application/json' -d $str "localhost:8080?topic=rand" &
+
 done
 echo "[FINISH]"
