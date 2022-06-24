@@ -18,7 +18,7 @@ func Get_request_handler(w http.ResponseWriter, r *http.Request) {
 	topic := args.Get("topic")
 	rows_arg := args.Get("rows")
 	if args.Get("alldata") == "true" {
-		rows_arg = "-1"
+		rows_arg = "10000000"
 	}
 	if rows_arg != "" {
 		rows, err = strconv.Atoi(rows_arg)

@@ -15,7 +15,7 @@ func Get_JSON_data(topic string, rows int) string {
 		return "{\"data\": \"No data\"}"
 	}
 	//
-	if rows >= 0 {
+	if rows > 0 {
 		var data_split []string
 		all_files := system_utils.List_files_in_directory(directory_path, topic)
 		if len(all_files) == 0 {
@@ -31,12 +31,15 @@ func Get_JSON_data(topic string, rows int) string {
 			}
 		}
 		length_of_data := len(data_split)
+		if rows > length_of_data {
+			rows = length_of_data
+		}
 		data_split = data_split[length_of_data-rows : length_of_data]
 		all_data := strings.Join(data_split, ",")
 		json_data := "{\"data\":[" + all_data + "]}"
 		return json_data
 	}
-	//
+	// error handling: rows <= 0
 	return "{\"data\": \"error\"}"
 }
 
