@@ -1,6 +1,7 @@
 /*
 json web server api
 TODO: add optional api key
+TODO: add topics arg to return all topics
 written by Mark Wottreng
 */
 
@@ -25,7 +26,7 @@ func main() {
 		system_utils.VERBOSE = false
 	}
 	//
-	println("[INFO] starting server on address: " + host_address_and_port)
+	println("[INFO] starting server on address: http://" + host_address_and_port + "/")
 	http.HandleFunc("/", rootHandler)
 	log.Fatal(http.ListenAndServe(host_address_and_port, nil))
 }

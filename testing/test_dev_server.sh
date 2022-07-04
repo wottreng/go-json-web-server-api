@@ -26,3 +26,7 @@ echo ""
 echo "[-->] retrieve latest row of data from server"
 curl "localhost:8080/?topic=rand" # | jq
 echo ""
+#
+echo "[-->] retrieve list of topics from server"
+curl "localhost:8080/?list_topics=1" # | jq
+echo ""

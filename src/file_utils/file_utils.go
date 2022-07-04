@@ -2,6 +2,7 @@ package file_utils
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"time_utils"
@@ -23,6 +24,23 @@ func Does_folder_exist(folder_path string) bool {
 		return false
 	}
 	return info.IsDir()
+}
+
+//function to list all files in directory
+func List_all_files_in_directory(path string) []string {
+	var files []string
+	var err error
+	//
+	files_list, err := ioutil.ReadDir(path)
+	if err != nil {
+		Log_error_to_file(err, "List_all_files_in_directory")
+		return files
+	}
+	//
+	for _, file := range files_list {
+		files = append(files, file.Name())
+	}
+	return files
 }
 
 //function to create folder

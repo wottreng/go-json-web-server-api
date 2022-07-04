@@ -21,7 +21,7 @@ func Check_if_args_are_present(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 	// if topic arg is not present, return error message
-	if !args.Has("topic") {
+	if !args.Has("topic") && !args.Has("list_topics") {
 		_, err := fmt.Fprintf(w, "not an endpoint\n")
 		if err != nil {
 			file_utils.Log_error_to_file(err)
