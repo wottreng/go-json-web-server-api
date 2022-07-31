@@ -43,7 +43,7 @@ func Method_not_allowed_handler(w http.ResponseWriter) {
 
 // function to return host ip address and port
 func Return_host_ip_address_and_port() string {
-	acceptable_addresses := []string{"192.168.", "10.42."}
+	//acceptable_addresses := []string{"192.168.", "10.42."}
 	host_ip_address := ""
 	host_port := "8080"
 	//
@@ -56,12 +56,12 @@ func Return_host_ip_address_and_port() string {
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
 				//println(ipnet.IP.String() + "\n")
-				for _, acceptable_address := range acceptable_addresses {
-					if ipnet.IP.String()[0:len(acceptable_address)] == acceptable_address {
-						host_ip_address = ipnet.IP.String()
-						break
-					}
-				}
+				//for _, acceptable_address := range acceptable_addresses {
+				//	if ipnet.IP.String()[0:len(acceptable_address)] == acceptable_address {
+				host_ip_address = ipnet.IP.String()
+				break
+				//}
+				//}
 			}
 		}
 	}
