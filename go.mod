@@ -4,9 +4,9 @@ replace file_utils => ./src/file_utils
 
 replace time_utils => ./src/time_utils
 
-replace http_utils => ./src/http_utils
-
 replace system_utils => ./src/system_utils
+
+replace http_utils => ./src/http_utils
 
 replace data_utils => ./src/data_utils
 

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"system_utils"
 )
 
 // function to check if topic arg is present
@@ -30,6 +31,28 @@ func Check_if_args_are_present(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 	return true
+}
+
+// function to check if api arg is present
+func Check_if_api_arg_is_present(r *http.Request) bool {
+	// if api key is not set then return true
+	if system_utils.Api_key == "" {
+		return true
+	}
+	// check if api key from request is correct
+	args := r.URL.Query()
+	// if api key not present return false
+	if !args.Has("api_key") {
+		return false
+	}
+	if args.Has("api") {
+		api_key_sent := args.Get("api_key")
+		if api_key_sent == system_utils.Api_key {
+			return true
+		}
+		return false
+	}
+	return false
 }
 
 // return response for methods not supported

@@ -31,4 +31,10 @@ a api server for sending and receiving json data
 * http_utils.go: http utilities
   * contains functions to handle http requests
 
+## Features
+* optional api key
+* per topic data handling
+* concurrency safe data handling
+
+
 Cheers, Mark

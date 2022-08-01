@@ -1,7 +1,6 @@
 /*
-json web server api
-TODO: add optional api key
-TODO: add topics arg to return all topics
+json api web server
+TODO: request data based on date
 written by Mark Wottreng
 */
 
@@ -15,20 +14,20 @@ import (
 	"system_utils"
 )
 
-//http server
 func main() {
-	// defaults
-	host_address_and_port := "localhost:8080"
-	system_utils.VERBOSE = true
-	// check if production mode is requested
-	if system_utils.Handle_cmd_line_args() == true { // true --> prod mode
-		host_address_and_port = http_utils.Return_host_ip_address_and_port()
+	// check for cmd line args
+	system_utils.Handle_cmd_line_args()
+	//
+	if system_utils.Mode == "dev" {
+		system_utils.VERBOSE = true
+	} else {
 		system_utils.VERBOSE = false
+		system_utils.Host_address_and_port = http_utils.Return_host_ip_address_and_port()
 	}
 	//
-	println("[INFO] starting server on address: http://" + host_address_and_port + "/")
+	println("[INFO] starting server on address: http://" + system_utils.Host_address_and_port + "/")
 	http.HandleFunc("/", rootHandler)
-	log.Fatal(http.ListenAndServe(host_address_and_port, nil))
+	log.Fatal(http.ListenAndServe(system_utils.Host_address_and_port, nil))
 }
 
 //
@@ -38,6 +37,12 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//check if topic arg is present
 	if http_utils.Check_if_args_are_present(w, r) == false {
+		return
+	}
+	//check if api arg is present
+	if http_utils.Check_if_api_arg_is_present(r) == false {
+		// return api key error
+		w.Write([]byte("{\"error\":\"api key incorrect\"}"))
 		return
 	}
 

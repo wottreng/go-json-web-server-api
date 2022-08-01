@@ -15,31 +15,49 @@ import (
 )
 
 var VERBOSE bool = false
+var Api_key string = ""
+var Host_address_and_port string = "localhost:8080"
+var Mode string = "dev"
 
 // function to check cmd line args for development or production mode
-func Handle_cmd_line_args() bool {
+func Handle_cmd_line_args() {
 	cmd_line_args := os.Args[1:]
 	//
 	if len(cmd_line_args) == 0 {
 		println("[INFO] no args given, enter dev mode")
-		return false
+		return
 	}
-	//
-	if cmd_line_args[0] == "-dev" {
-		println("[INFO] enter dev mode")
-		return false
-	}
-	//
-	if cmd_line_args[0] == "-prod" {
-		println("[INFO] enter prod mode")
-		return true
+	// iterate over cmd line args
+	for _, cmd_line_arg := range cmd_line_args {
+		// check if api key is present
+		if cmd_line_arg == "--api" {
+			println("[INFO] enter api key entered")
+			// find --api arg in cmd line args
+			for i, cmd_line_arg := range cmd_line_args {
+				if cmd_line_arg == "--api" {
+					// get api key
+					Api_key = cmd_line_args[i+1]
+					println("[INFO] api key: " + Api_key)
+					break
+				}
+			}
+		}
+		//
+		if cmd_line_arg == "--prod" {
+			println("[INFO] enter prod mode")
+			Mode = "prod"
+			VERBOSE = false
+		}
+		if cmd_line_arg == "--dev" {
+			Mode = "dev"
+			println("[INFO] enter dev mode")
+		}
 	}
 	//
 	println("[ERROR] invalid args given!")
 	println("[DEBUG] valid args: -dev or -prod")
 	fmt.Println("[DEBUG] args received: ", cmd_line_args)
 	println("[INFO] enter dev mode")
-	return false
 }
 
 // list all files in directory that match substring and order by mod time
